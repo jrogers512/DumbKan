@@ -91,7 +91,39 @@ Task data is stored in `/app/data/tasks.json`. When using Docker, mount this dir
    npm start
    ```
 
-4. Open your browser and navigate to:
+   To create a systemctl service daemonize the service, create `/etc/systemd/system/dumbkan.service` (make sure to update WorkingDirectory):
+   ```
+   [Unit]
+   Description=DumbKan - A Dumb Kanban Board
+   After=network.target
+   
+   [Service]
+   Type=simple
+   ExecStart=/usr/bin/npm start
+   WorkingDirectory=/opt/dumbkan
+   Restart=always
+   Environment=NODE_ENV=production
+   Environment=PORT=3000
+   # Optional: add your custom PIN here if needed
+   # Environment=DUMBKAN_PIN=1234
+   
+   User=root
+   # It's better to run as a non-root user if possible
+   
+   [Install]
+   WantedBy=multi-user.target
+   ```
+
+   Then run
+
+   ``` shell
+   sudo systemctl daemon-reexec
+   sudo systemctl daemon-reload
+   sudo systemctl enable dumbkan
+   sudo systemctl start dumbkan
+   ```
+
+5. Open your browser and navigate to:
    ```
    http://localhost:3000
    ```
